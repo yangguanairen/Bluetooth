@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.sena.bluetooth.ble.BleClientActivity
+import com.sena.bluetooth.ble.BleServerActivity
 import com.sena.bluetooth.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -63,13 +64,19 @@ class MainActivity : AppCompatActivity() {
            intent.putExtra("status", haveAllCondition)
            startActivity(intent)
        }
+        binding.bleServer.setOnClickListener {
+            val intent = Intent(this, BleServerActivity::class.java)
+            intent.putExtra("status", haveAllCondition)
+            startActivity(intent)
+        }
     }
 
     private fun checkPermission() {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             listOf(
                 Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_SCAN
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
         } else {
             listOf(

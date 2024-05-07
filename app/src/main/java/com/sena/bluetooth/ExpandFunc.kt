@@ -1,9 +1,15 @@
 package com.sena.bluetooth
 
+import android.Manifest
+import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 
 
 /**
@@ -18,6 +24,45 @@ fun toast(text: String) {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
         }
+    }
+}
+
+fun Context.checkConnectPermission(func: () -> Unit) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+        func.invoke()
+    } else {
+        Log.e("SDKTEST", "测试: 无连接权限")
+    }
+}
+fun Context.checkAdvertisePermission(func: () -> Unit) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
+        func.invoke()
+    } else {
+        Log.e("SDKTEST", "测试: 无广播权限")
+    }
+}
+
+fun Context.getDeviceName(device: BluetoothDevice): String? {
+    return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+        device.name
+    } else {
+        null
+    }
+}
+
+fun <T> Context.getOrNull(func: () -> T?): T? {
+    return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+        func.invoke()
+    } else {
+        null
+    }
+}
+
+fun <T> Context.getOrDefault(func: () -> T?, default: T?): T? {
+    return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+        func.invoke()
+    } else {
+        default
     }
 }
 
