@@ -17,7 +17,6 @@ import com.sena.bluetooth.checkConnectPermission
 import com.sena.bluetooth.databinding.ActivityBleClientBinding
 import com.sena.bluetooth.getDeviceName
 import com.sena.bluetooth.toast
-import java.util.UUID
 
 class BleClientActivity : AppCompatActivity() {
 
@@ -96,14 +95,12 @@ class BleClientActivity : AppCompatActivity() {
     }
 
     private fun setNotify(gatt: BluetoothGatt) {
-//        val service = gatt.getService(UUID.fromString("0000ff12-0000-1000-8000-00805f9b34fb")) ?: return
-//        val characteristic = service.getCharacteristic(UUID.fromString("0000ff02-0000-1000-8000-00805f9b34fb"))
         val service = gatt.getService(UUID_SERVICE) ?: return
         val characteristic = service.getCharacteristic(UUID_CHA_READ_NOTIFY)
         checkConnectPermission {
             /// 设置Characteristic通知
             val setNotifyResult = gatt.setCharacteristicNotification(characteristic, true)
-            val descriptor = characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+            val descriptor = characteristic.getDescriptor(UUID_DESC_NOTIFY)
             // 服务端不主动发数据, 只通知客户端去读取数据
             // descriptor.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
             // 向Characteristic的Descriptor属性写入通知开关, 使蓝牙设备主动向手机发送数据
@@ -115,16 +112,12 @@ class BleClientActivity : AppCompatActivity() {
     }
 
     private fun read(gatt: BluetoothGatt) {
-//        val service = gatt.getService(UUID.fromString("0000ff12-0000-1000-8000-00805f9b34fb")) ?: return
-//        val characteristic = service.getCharacteristic(UUID.fromString("0000ff02-0000-1000-8000-00805f9b34fb"))
         val service = gatt.getService(UUID_SERVICE) ?: return
         val characteristic = service.getCharacteristic(UUID_CHA_READ_NOTIFY)
         checkConnectPermission { gatt.readCharacteristic(characteristic) }
     }
 
     private fun write(gatt: BluetoothGatt) {
-//        val service = gatt.getService(UUID.fromString("0000ff12-0000-1000-8000-00805f9b34fb")) ?: return
-//        val characteristic = service.getCharacteristic(UUID.fromString("0000ff02-0000-1000-8000-00805f9b34fb"))
         val service = gatt.getService(UUID_SERVICE) ?: return
         val characteristic = service.getCharacteristic(UUID_CAHR_WRITE)
         characteristic.setValue(binding.input.text.toString())

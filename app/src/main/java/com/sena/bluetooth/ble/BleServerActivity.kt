@@ -71,7 +71,7 @@ class BleServerActivity : AppCompatActivity() {
         // 广播数据(必须)
         val advertiseData = AdvertiseData.Builder()
             // 包含蓝牙名称
-            .setIncludeDeviceName(false)
+            .setIncludeDeviceName(true)
             // 包含发射功率级别
             .setIncludeTxPowerLevel(false)
             // 设备厂商数据, 自定义
@@ -95,15 +95,18 @@ class BleServerActivity : AppCompatActivity() {
         val service = BluetoothGattService(UUID_SERVICE, BluetoothGattService.SERVICE_TYPE_PRIMARY)
         // 添加可读+通知characteristic
         val characteristicRead = BluetoothGattCharacteristic(UUID_CHA_READ_NOTIFY,
-        BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PROPERTY_NOTIFY, BluetoothGattCharacteristic.PERMISSION_READ)
+        BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_NOTIFY, BluetoothGattCharacteristic.PERMISSION_READ)
         characteristicRead.addDescriptor(BluetoothGattDescriptor(UUID_DESC_NOTIFY, BluetoothGattCharacteristic.PERMISSION_WRITE))
         service.addCharacteristic(characteristicRead)
         // 添加可写characteristic
         val characteristicWrite = BluetoothGattCharacteristic(UUID_CAHR_WRITE,
-            BluetoothGattCharacteristic.PERMISSION_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE)
+            BluetoothGattCharacteristic.PROPERTY_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE)
         service.addCharacteristic(characteristicWrite)
-        bleManager.openGattServer(this, mGattCallback)
-        mGattServer?.addService(service)
+        mGattServer = bleManager.openGattServer(this, mGattCallback)
+        mGattServer?.apply {
+            mGattCallback.setGattServer(this)
+            addService(service)
+        }
     }
 
     private fun logPrint(text: String) {

@@ -61,20 +61,23 @@ class BleClientGattCallback(context: Context, func: (log: String) -> Unit) : Blu
 
     override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
         super.onCharacteristicChanged(gatt, characteristic, value)
-        val log = "[${gatt.device.address}]读取数据(十进制)\n${characteristic.value.joinToString(", ")}"
+        val charValue = characteristic.value
+        val log = "[${gatt.device.address}]读取数据(十进制)\n${charValue.joinToString(", ")}\nUTF-8:${String(charValue)}"
         mFunc.invoke(log)
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, value, status)
-        val log = "[${gatt.device.address}]读取数据(十进制)\n${characteristic.value.joinToString(", ")}"
+        val charValue = characteristic.value
+        val log = "[${gatt.device.address}]读取数据(十进制)\n${charValue.joinToString(", ")}\nUTF-8:${String(charValue)}"
         mFunc.invoke(log)
     }
 
     override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
         super.onCharacteristicWrite(gatt, characteristic, status)
         if (gatt == null || characteristic == null) return
-        val log = "[${gatt.device.address}]写入数据(十进制)\n${characteristic.value.joinToString(", ")}"
+        val charValue = characteristic.value
+        val log = "[${gatt.device.address}]写入数据(十进制)\n${charValue.joinToString(", ")}\nUTF-8:${String(charValue)}"
         mFunc.invoke(log)
     }
 
