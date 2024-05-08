@@ -23,4 +23,21 @@
         android:layout_marginTop="16dp"
         style="@style/button" />
 
+
+    <TextView
+        android:id="@+id/btClient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="BT客户端"
+        style="@style/button" />
+
+    <TextView
+        android:id="@+id/bteServer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BT服务端"
+        android:layout_marginTop="16dp"
+        style="@style/button" />
+
 </LinearLayout>

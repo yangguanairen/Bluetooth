@@ -50,19 +50,11 @@ fun Context.getDeviceName(device: BluetoothDevice): String? {
     }
 }
 
-fun <T> Context.getOrNull(func: () -> T?): T? {
+fun Context.getDeviceBond(device: BluetoothDevice): Int? {
     return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-        func.invoke()
+        device.bondState
     } else {
         null
-    }
-}
-
-fun <T> Context.getOrDefault(func: () -> T?, default: T?): T? {
-    return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-        func.invoke()
-    } else {
-        default
     }
 }
 

@@ -14,6 +14,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.sena.bluetooth.ble.BleClientActivity
 import com.sena.bluetooth.ble.BleServerActivity
+import com.sena.bluetooth.bt.BtClientActivity
+import com.sena.bluetooth.bt.BtServerActivity
 import com.sena.bluetooth.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +68,16 @@ class MainActivity : AppCompatActivity() {
        }
         binding.bleServer.setOnClickListener {
             val intent = Intent(this, BleServerActivity::class.java)
+            intent.putExtra("status", haveAllCondition)
+            startActivity(intent)
+        }
+        binding.btClient.setOnClickListener {
+            val intent = Intent(this, BtClientActivity::class.java)
+            intent.putExtra("status", haveAllCondition)
+            startActivity(intent)
+        }
+        binding.bteServer.setOnClickListener {
+            val intent = Intent(this, BtServerActivity::class.java)
             intent.putExtra("status", haveAllCondition)
             startActivity(intent)
         }
