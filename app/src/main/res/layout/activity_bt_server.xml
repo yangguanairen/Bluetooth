@@ -11,7 +11,8 @@
     <ScrollView
         android:id="@+id/logLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="@drawable/bg_view">
 
         <TextView
@@ -22,5 +23,61 @@
             android:padding="8dp" />
 
     </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:hint="@string/hint_input_msg"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/sendText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/button"
+            android:layout_marginStart="4dp"
+            android:text="@string/send_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/disconnect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/button"
+            android:layout_marginStart="4dp"
+            android:text="@string/disconnect" />
+
+        <TextView
+            android:id="@+id/sendFile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/button"
+            android:layout_marginStart="4dp"
+            android:text="@string/send_file" />
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

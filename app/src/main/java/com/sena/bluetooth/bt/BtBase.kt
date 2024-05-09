@@ -4,11 +4,11 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.utils.FileUtil
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.util.UUID
 
 
@@ -33,7 +33,7 @@ open class BtBase(context: Context) {
     private var mDos: DataOutputStream? = null
 
 
-    fun loopRead(socket: BluetoothSocket) {
+    protected fun loopRead(socket: BluetoothSocket) {
         mSocket = socket
         remoteAddress = socket.remoteDevice.address
         kotlin.runCatching {
@@ -47,33 +47,36 @@ open class BtBase(context: Context) {
                     FLAG_MSG -> readMsg(dis)
                     FLAG_FILE -> readFile(dis)
                     FLAG_CLOSE -> {
+                        close()
                         break
                     }
                 }
             }
-            close()
-        }.onFailure { error(it) }
+        }
     }
 
     private fun readMsg(dis: DataInputStream) {
         val msg = dis.readUTF()
-        mListener?.onMsgOperated(remoteAddress, msg)
+        mListener?.onMsgOperated(remoteAddress, msg, false)
     }
 
     private fun readFile(dis: DataInputStream) {
         val fileName = dis.readUTF()
         val fileLen = dis.readLong()
-        val targetFile = File(mContext.externalCacheDir, fileName)
-        val fos = FileOutputStream(targetFile)
+        val targetFileUri = FileUtil.createFileInDownload(mContext, fileName, null) ?: return
+        val fos = mContext.contentResolver.openOutputStream(targetFileUri) ?: return
         var len: Int
+        var readLen = 0
         val buffer = ByteArray(4 * 1024)
-        mListener?.onFileOperated(remoteAddress, fileName, 0)
+        mListener?.onFileOperated(remoteAddress, fileName, 0, false, null)
         while (dis.read(buffer).also { len = it } > 0) {
             fos.write(buffer, 0, len)
-            if (len >= fileLen) break
+            readLen += len
+            if (readLen >= fileLen) break
         }
+        fos.flush()
         fos.close()
-        mListener?.onFileOperated(remoteAddress, fileName, 100)
+        mListener?.onFileOperated(remoteAddress, fileName, 100, false, FileUtil.uriToPath(mContext, targetFileUri))
     }
 
 
@@ -85,7 +88,7 @@ open class BtBase(context: Context) {
                 writeInt(FLAG_MSG)
                 writeUTF(msg)
                 flush()
-                mListener?.onMsgOperated(remoteAddress, msg)
+                mListener?.onMsgOperated(remoteAddress, msg, true)
             }
         }.onFailure { error(it) }
         isSending = false
@@ -105,12 +108,12 @@ open class BtBase(context: Context) {
                     writeLong(file.length())
                     var len: Int
                     val buffer = ByteArray(4 * 1024)
-                    mListener?.onFileOperated(remoteAddress, fileName, 0)
+                    mListener?.onFileOperated(remoteAddress, fileName, 0, true, null)
                     while (fis.read(buffer).also { len = it  } > 0) {
                         write(buffer, 0, len)
                     }
                     flush()
-                    mListener?.onFileOperated(remoteAddress, fileName, 100)
+                    mListener?.onFileOperated(remoteAddress, fileName, 100, true, null)
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -121,7 +124,15 @@ open class BtBase(context: Context) {
     }
 
     protected fun sendClose() {
-        kotlin.runCatching { mDos?.writeInt(FLAG_CLOSE) }
+        if (checkSending()) return
+        isSending = true
+        kotlin.runCatching {
+            mDos?.apply {
+                writeInt(FLAG_CLOSE)
+                mListener?.onMsgOperated(remoteAddress, "关闭", true)
+            }
+        }.onFailure { error(it) }
+        isSending = false
     }
 
     protected fun error(throwable: Throwable) {
@@ -132,17 +143,21 @@ open class BtBase(context: Context) {
         }
         isReading = false
         isSending = false
+        mDos?.close()
+        mDos = null
         mSocket = null
         remoteAddress = ""
     }
 
     protected fun close() {
+        isReading = false
+        isSending = false
+        mDos?.close()
+        mDos = null
         kotlin.runCatching { mSocket?.close() }
         if (mSocket != null) {
             mListener?.onBtStateChanged(remoteAddress, BtState.DISCONNECT)
         }
-        isReading = false
-        isSending = false
         mSocket = null
         remoteAddress = ""
     }
@@ -154,7 +169,11 @@ open class BtBase(context: Context) {
         return isSending
     }
 
-    fun isConnected(device: BluetoothDevice): Boolean {
+    fun isConnected(): Boolean {
+        return mSocket?.isConnected == true
+    }
+
+    fun isConnectedWithDevice(device: BluetoothDevice): Boolean {
         return mSocket?.isConnected == true && mSocket?.remoteDevice == device
     }
 
@@ -166,8 +185,8 @@ open class BtBase(context: Context) {
 
     interface BtListener {
         fun onBtStateChanged(address: String, state: BtState)
-        fun onMsgOperated(address: String, msg: String)
-        fun onFileOperated(address: String, fileName: String, progress: Int)
+        fun onMsgOperated(address: String, msg: String, isSender: Boolean)
+        fun onFileOperated(address: String, fileName: String, progress: Int, isSender: Boolean, savePath: String?)
     }
 
     enum class BtState {

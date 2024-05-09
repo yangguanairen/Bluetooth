@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:lines="1"
-            android:hint="输入消息"
+            android:hint="@string/hint_input_msg"
             android:maxLines="1"
             android:singleLine="true"
             android:layout_marginEnd="4dp" />
@@ -47,17 +47,35 @@
             android:layout_weight="1"
             style="@style/button"
             android:layout_marginStart="4dp"
-            android:text="发送文本" />
+            android:text="@string/send_text" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/sendFile"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/button"
-        android:layout_marginStart="4dp"
-        android:text="选择文件并发送" />
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/disconnect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/button"
+            android:layout_marginStart="4dp"
+            android:text="@string/disconnect" />
+
+        <TextView
+            android:id="@+id/sendFile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/button"
+            android:layout_marginStart="4dp"
+            android:text="@string/send_file" />
+
+    </LinearLayout>
 
     <ScrollView
         android:id="@+id/logLayout"

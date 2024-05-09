@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Bluetooth</string>
+
+    <string name="hint_input_msg">输入消息</string>
+    <string name="send_text">发送文本</string>
+    <string name="disconnect">断开连接</string>
+    <string name="send_file">选择文件并发送</string>
 </resources>

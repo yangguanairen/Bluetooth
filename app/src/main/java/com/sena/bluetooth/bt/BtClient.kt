@@ -14,8 +14,8 @@ import com.sena.bluetooth.checkConnectPermission
 class BtClient(context: Context) : BtBase(context) {
 
     fun connect(device: BluetoothDevice) {
-        close()
         Thread {
+            closeConnect()
             mContext.checkConnectPermission {
                 kotlin.runCatching {
                     mListener?.onBtStateChanged(device.address, BtState.CONNECTING)
@@ -28,7 +28,6 @@ class BtClient(context: Context) : BtBase(context) {
 
     fun closeConnect() {
         sendClose()
-        Thread.sleep(1000)
         close()
     }
 

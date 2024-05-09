@@ -32,7 +32,6 @@ class BtServer(context: Context) : BtBase(context) {
 
     fun closeListen() {
         sendClose()
-        Thread.sleep(1000)
         close()
         kotlin.runCatching {
             mSSocket?.close()

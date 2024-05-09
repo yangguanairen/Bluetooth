@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initLaunch() {
         requestPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-            val isSuccess = result.none { !it.value }
+            val isSuccess = result.none { it.key != Manifest.permission.READ_EXTERNAL_STORAGE && !it.value }
             if (isSuccess) {
                 checkBle()
             } else {
@@ -88,12 +88,14 @@ class MainActivity : AppCompatActivity() {
             listOf(
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE
             )
         } else {
             listOf(
                 Manifest.permission.BLUETOOTH,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE
             )
         }
         val notGrantedList = arrayListOf<String>()

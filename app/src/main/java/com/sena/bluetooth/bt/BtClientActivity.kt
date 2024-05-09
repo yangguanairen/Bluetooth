@@ -1,5 +1,6 @@
 package com.sena.bluetooth.bt
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -9,12 +10,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sena.bluetooth.checkConnectPermission
 import com.sena.bluetooth.databinding.ActivityBtClientBinding
+import com.sena.bluetooth.getOrNull
 import com.sena.bluetooth.toast
+import com.sena.bluetooth.utils.FileUtil
+import java.text.SimpleDateFormat
 
 class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
 
@@ -24,6 +28,10 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
     private val mClient: BtClient = BtClient(this).apply {
         setBtListener(this@BtClientActivity)
     }
+    private var curLog = ""
+    @SuppressLint("SimpleDateFormat")
+    private val dataFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private lateinit var requestFile: ActivityResultLauncher<String>
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -44,6 +52,7 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
             val bleManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             mBleAdapter = bleManager.adapter
         }
+        initLaunch()
         initView()
         registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
         mBleAdapter?.let { startScan() }
@@ -59,6 +68,20 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
         }
     }
 
+    private fun initLaunch() {
+        requestFile = registerForActivityResult(ActivityResultContracts.GetContent()) {
+            if (it == null) {
+                toast("未选择文件...")
+                return@registerForActivityResult
+            }
+            getOrNull { FileUtil.uriToPath(this, it) }?.let { path ->
+                println("测试: $path")
+                mClient.sendFile(path)
+            }
+        }
+    }
+
+
     private fun initView() {
         mListAdapter.setOnItemClickListener { a, _, p ->
             a.getItem(p)?.let { connect(it) }
@@ -70,6 +93,7 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
         binding.scan.setOnClickListener { startScan() }
         binding.sendText.setOnClickListener { sendText() }
         binding.sendFile.setOnClickListener { sendFile() }
+        binding.disconnect.setOnClickListener { disconnect() }
     }
 
     private fun startScan() {
@@ -85,17 +109,40 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
     }
 
     private fun connect(device: BluetoothDevice) {
-        if (mClient.isConnected(device)) return
+        if (mClient.isConnectedWithDevice(device)) {
+            toast("设备已连接")
+            return
+        }
         mClient.connect(device)
     }
 
+    private fun disconnect() {
+        if (!mClient.isConnected()) {
+            toast("未连接...")
+            return
+        }
+        mClient.closeConnect()
+    }
+
     private fun sendText() {
+        if (!mClient.isConnected()) {
+            toast("未连接...")
+            return
+        }
         val text = binding.input.text.toString()
+        if (text.isEmpty()) {
+            toast("发送文本不得为空...")
+            return
+        }
         mClient.sendMsg(text)
     }
 
     private fun sendFile() {
-
+        if (!mClient.isConnected()) {
+            toast("未连接...")
+            return
+        }
+        requestFile.launch("*/*")
     }
 
     override fun onBtStateChanged(address: String, state: BtBase.BtState) {
@@ -108,23 +155,35 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
         }
     }
 
-    override fun onMsgOperated(address: String, msg: String) {
-        logPrint("向[$address]发送消息: $msg")
+    override fun onMsgOperated(address: String, msg: String, isSender: Boolean) {
+        if (isSender) {
+            logPrint("向[$address]发送消息: $msg")
+        } else {
+            logPrint("从[$address]接收到消息: $msg")
+        }
     }
 
-    override fun onFileOperated(address: String, fileName: String, progress: Int) {
+    override fun onFileOperated(address: String, fileName: String, progress: Int, isSender: Boolean, savePath: String?) {
         if (progress == 0) {
-            logPrint("向[$address]发送文件($fileName)中...")
+            if (isSender) {
+                logPrint("向[$address]发送文件($fileName)中...")
+            } else {
+                logPrint("从[$address]接收文件($fileName)中...")
+            }
         } else if (progress == 100) {
-            logPrint("向[$address]发送文件($fileName)完成")
+            if (isSender) {
+                logPrint("向[$address]发送文件($fileName)完成")
+            } else {
+                logPrint("从[$address]接收文件($fileName)完成\n存储路径:$savePath")
+            }
         }
     }
 
     private fun logPrint(text: String) {
         println(text)
-        val tvText = binding.log.text.toString() + "\n" + text + "\n"
-        Handler(Looper.getMainLooper()).post {
-            binding.log.text = tvText
+        curLog = curLog + "\n" + dataFormat.format(System.currentTimeMillis()) + "\n" + text + "\n"
+        runOnUiThread {
+            binding.log.text = curLog
             val scrollY = binding.log.measuredHeight - binding.logLayout.height
             binding.logLayout.smoothScrollTo(0, scrollY)
         }

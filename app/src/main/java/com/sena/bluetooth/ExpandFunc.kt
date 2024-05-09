@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 
 
@@ -56,5 +55,9 @@ fun Context.getDeviceBond(device: BluetoothDevice): Int? {
     } else {
         null
     }
+}
+
+fun <T> getOrNull(func: () -> T): T? {
+    return runCatching { func.invoke() }.getOrNull()
 }
 
