@@ -76,7 +76,7 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
             }
             getOrNull { FileUtil.uriToPath(this, it) }?.let { path ->
                 println("测试: $path")
-                mClient.sendFile(path)
+                mClient.sendClientFile(path)
             }
         }
     }
@@ -134,7 +134,7 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
             toast("发送文本不得为空...")
             return
         }
-        mClient.sendMsg(text)
+        mClient.sendClientMsg(text)
     }
 
     private fun sendFile() {
@@ -179,13 +179,15 @@ class BtClientActivity : AppCompatActivity(), BtBase.BtListener {
         }
     }
 
+    override fun onOperateErrorLog(log: String) {
+        logPrint(log)
+    }
+
     private fun logPrint(text: String) {
         println(text)
         curLog = curLog + "\n" + dataFormat.format(System.currentTimeMillis()) + "\n" + text + "\n"
-        runOnUiThread {
-            binding.log.text = curLog
-            val scrollY = binding.log.measuredHeight - binding.logLayout.height
-            binding.logLayout.smoothScrollTo(0, scrollY)
-        }
+        binding.log.text = curLog
+        val scrollY = binding.log.measuredHeight - binding.logLayout.height
+        binding.logLayout.smoothScrollTo(0, scrollY)
     }
 }

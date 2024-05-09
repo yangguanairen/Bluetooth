@@ -52,7 +52,7 @@ class BtServerActivity : AppCompatActivity(), BtBase.BtListener {
             }
             getOrNull { FileUtil.uriToPath(this, it) }?.let { path ->
                 println("测试: $path")
-                mServer.sendFile(path)
+                mServer.sendServerFile(path)
             }
         }
     }
@@ -77,7 +77,7 @@ class BtServerActivity : AppCompatActivity(), BtBase.BtListener {
             toast("发送文本不得为空...")
             return
         }
-        mServer.sendMsg(text)
+        mServer.sendServerMsg(text)
     }
 
     private fun sendFile() {
@@ -100,11 +100,9 @@ class BtServerActivity : AppCompatActivity(), BtBase.BtListener {
     private fun logPrint(text: String) {
         println(text)
         curLog = curLog + "\n" + dataFormat.format(System.currentTimeMillis()) + "\n" + text + "\n"
-        runOnUiThread {
-            binding.log.text = curLog
-            val scrollY = binding.log.measuredHeight - binding.logLayout.height
-            binding.logLayout.smoothScrollTo(0, scrollY)
-        }
+        binding.log.text = curLog
+        val scrollY = binding.log.measuredHeight - binding.logLayout.height
+        binding.logLayout.smoothScrollTo(0, scrollY)
     }
 
     override fun onBtStateChanged(address: String, state: BtBase.BtState) {
@@ -145,5 +143,9 @@ class BtServerActivity : AppCompatActivity(), BtBase.BtListener {
                 logPrint("从[$address]接收文件($fileName)完成\n存储路径:$savePath")
             }
         }
+    }
+
+    override fun onOperateErrorLog(log: String) {
+        logPrint(log)
     }
 }

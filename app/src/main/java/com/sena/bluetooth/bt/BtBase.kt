@@ -4,7 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.getOrNull
 import com.sena.bluetooth.utils.FileUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -27,111 +30,109 @@ open class BtBase(context: Context) {
     private val FLAG_CLOSE = -1
 
     private var mSocket: BluetoothSocket? = null
-    private var remoteAddress: String = ""
+    protected var remoteAddress: String = ""
     private var isSending = false
     private var isReading = false
     private var mDos: DataOutputStream? = null
 
 
-    protected fun loopRead(socket: BluetoothSocket) {
+    protected suspend fun loopRead(socket: BluetoothSocket) {
         mSocket = socket
         remoteAddress = socket.remoteDevice.address
-        kotlin.runCatching {
+        withContext(Dispatchers.IO) {
             if (!socket.isConnected) mContext.checkConnectPermission { socket.connect() }
-            mListener?.onBtStateChanged(remoteAddress, BtState.CONNECTED)
-            mDos = DataOutputStream(socket.outputStream)
-            val dis = DataInputStream(socket.inputStream)
-            isReading = true
-            while (isReading) {
-                when (dis.readInt()) {
-                    FLAG_MSG -> readMsg(dis)
-                    FLAG_FILE -> readFile(dis)
-                    FLAG_CLOSE -> {
-                        close()
-                        break
-                    }
-                }
+        }
+        mListener?.onBtStateChanged(remoteAddress, BtState.CONNECTED)
+        mDos = DataOutputStream(socket.outputStream)
+        val dis = DataInputStream(socket.inputStream)
+        isReading = true
+        while (isReading) {
+            val flag = withContext(Dispatchers.IO) {
+                getOrNull { dis.readInt() }
+            }
+            when (flag) {
+                FLAG_MSG -> readMsg(dis)
+                FLAG_FILE -> readFile(dis)
+                FLAG_CLOSE -> close()
             }
         }
     }
 
-    private fun readMsg(dis: DataInputStream) {
-        val msg = dis.readUTF()
+    private suspend fun readMsg(dis: DataInputStream) {
+        val msg = withContext(Dispatchers.IO) { dis.readUTF() }
         mListener?.onMsgOperated(remoteAddress, msg, false)
     }
 
-    private fun readFile(dis: DataInputStream) {
-        val fileName = dis.readUTF()
-        val fileLen = dis.readLong()
+    private suspend fun readFile(dis: DataInputStream) {
+        val fileName = withContext(Dispatchers.IO) { dis.readUTF() }
+        val fileLen = withContext(Dispatchers.IO) { dis.readLong() }
         val targetFileUri = FileUtil.createFileInDownload(mContext, fileName, null) ?: return
         val fos = mContext.contentResolver.openOutputStream(targetFileUri) ?: return
         var len: Int
         var readLen = 0
         val buffer = ByteArray(4 * 1024)
         mListener?.onFileOperated(remoteAddress, fileName, 0, false, null)
-        while (dis.read(buffer).also { len = it } > 0) {
-            fos.write(buffer, 0, len)
-            readLen += len
-            if (readLen >= fileLen) break
+        withContext(Dispatchers.IO) {
+            while (dis.read(buffer).also { len = it } > 0) {
+                fos.write(buffer, 0, len)
+                readLen += len
+                if (readLen >= fileLen) break
+            }
+            fos.flush()
+            fos.close()
         }
-        fos.flush()
-        fos.close()
+
         mListener?.onFileOperated(remoteAddress, fileName, 100, false, FileUtil.uriToPath(mContext, targetFileUri))
     }
 
 
-    fun sendMsg(msg: String) {
+    protected suspend fun sendMsg(msg: String) {
         if (checkSending()) return
         isSending = true
-        kotlin.runCatching {
+        withContext(Dispatchers.IO) {
             mDos?.apply {
                 writeInt(FLAG_MSG)
                 writeUTF(msg)
                 flush()
-                mListener?.onMsgOperated(remoteAddress, msg, true)
             }
-        }.onFailure { error(it) }
+        }
+        mListener?.onMsgOperated(remoteAddress, msg, true)
         isSending = false
     }
 
-    fun sendFile(path: String) {
+    protected suspend fun sendFile(path: String) {
         if (checkSending()) return
         isSending = true
-        Thread {
-            kotlin.runCatching {
-                val file = File(path)
-                val fileName = file.name
-                val fis = FileInputStream(file)
-                mDos?.apply {
-                    writeInt(FLAG_FILE)
-                    writeUTF(file.name)
-                    writeLong(file.length())
-                    var len: Int
-                    val buffer = ByteArray(4 * 1024)
-                    mListener?.onFileOperated(remoteAddress, fileName, 0, true, null)
-                    while (fis.read(buffer).also { len = it  } > 0) {
-                        write(buffer, 0, len)
-                    }
-                    flush()
-                    mListener?.onFileOperated(remoteAddress, fileName, 100, true, null)
+        val file = File(path)
+        val fileName = file.name
+        mListener?.onFileOperated(remoteAddress, fileName, 0, true, null)
+        withContext(Dispatchers.IO) {
+            val fis = FileInputStream(file)
+            mDos?.apply {
+                writeInt(FLAG_FILE)
+                writeUTF(file.name)
+                writeLong(file.length())
+                var len: Int
+                val buffer = ByteArray(4 * 1024)
+                while (fis.read(buffer).also { len = it  } > 0) {
+                    write(buffer, 0, len)
                 }
-            }.onFailure {
-                it.printStackTrace()
-                error(it)
+                flush()
             }
-            isSending = false
-        }.start()
+        }
+        mListener?.onFileOperated(remoteAddress, fileName, 100, true, null)
+        isSending = false
     }
 
-    protected fun sendClose() {
+    protected suspend fun sendClose() {
         if (checkSending()) return
         isSending = true
-        kotlin.runCatching {
-            mDos?.apply {
-                writeInt(FLAG_CLOSE)
-                mListener?.onMsgOperated(remoteAddress, "关闭", true)
-            }
-        }.onFailure { error(it) }
+        withContext(Dispatchers.IO) {
+            mDos?.writeInt(FLAG_CLOSE)
+        }
+        mDos?.let {
+            mListener?.onMsgOperated(remoteAddress, "关闭", true)
+        }
         isSending = false
     }
 
@@ -187,6 +188,7 @@ open class BtBase(context: Context) {
         fun onBtStateChanged(address: String, state: BtState)
         fun onMsgOperated(address: String, msg: String, isSender: Boolean)
         fun onFileOperated(address: String, fileName: String, progress: Int, isSender: Boolean, savePath: String?)
+        fun onOperateErrorLog(log: String)
     }
 
     enum class BtState {
@@ -194,7 +196,7 @@ open class BtBase(context: Context) {
         CONNECTED,
         DISCONNECT,
         BUSY,
-        ERROR
+        ERROR,
     }
 
 }
