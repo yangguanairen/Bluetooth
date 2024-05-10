@@ -3,8 +3,8 @@ package com.sena.bluetooth.bt
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import com.sena.bluetooth.checkConnectPermission
-import com.sena.bluetooth.getOrNull
+import com.sena.bluetooth.utils.checkConnectPermission
+import com.sena.bluetooth.utils.getOrNull
 import com.sena.bluetooth.utils.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

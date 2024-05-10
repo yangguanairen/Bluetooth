@@ -1,4 +1,4 @@
-package com.sena.bluetooth
+package com.sena.bluetooth.utils
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.sena.bluetooth.MyApplication
 
 
 /**

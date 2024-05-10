@@ -15,8 +15,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
-import com.sena.bluetooth.checkAdvertisePermission
-import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.R
+import com.sena.bluetooth.utils.checkAdvertisePermission
+import com.sena.bluetooth.utils.checkConnectPermission
 import com.sena.bluetooth.databinding.ActivityBleServerBinding
 import java.util.UUID
 
@@ -45,7 +46,7 @@ class BleServerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        binding.toolbar.setTitle(R.string.ble_server)
         initServer()
     }
 

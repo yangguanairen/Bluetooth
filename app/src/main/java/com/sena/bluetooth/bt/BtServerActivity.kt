@@ -8,9 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import com.sena.bluetooth.R
 import com.sena.bluetooth.databinding.ActivityBtServerBinding
-import com.sena.bluetooth.getOrNull
-import com.sena.bluetooth.toast
+import com.sena.bluetooth.utils.getOrNull
+import com.sena.bluetooth.utils.toast
 import com.sena.bluetooth.utils.FileUtil
 import java.text.SimpleDateFormat
 
@@ -58,6 +59,7 @@ class BtServerActivity : AppCompatActivity(), BtBase.BtListener {
     }
 
     private fun initView() {
+        binding.toolbar.setTitle(R.string.bt_server)
         binding.sendText.setOnClickListener { sendText() }
         binding.sendFile.setOnClickListener { sendFile() }
         binding.disconnect.setOnClickListener { disconnect() }

@@ -13,10 +13,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.INTENT_STATUS
+import com.sena.bluetooth.R
+import com.sena.bluetooth.utils.checkConnectPermission
 import com.sena.bluetooth.databinding.ActivityBleClientBinding
-import com.sena.bluetooth.getDeviceName
-import com.sena.bluetooth.toast
+import com.sena.bluetooth.utils.getDeviceName
+import com.sena.bluetooth.utils.toast
 
 class BleClientActivity : AppCompatActivity() {
 
@@ -40,7 +42,7 @@ class BleClientActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val status = intent.getBooleanExtra("status", false)
+        val status = intent.getBooleanExtra(INTENT_STATUS, false)
         if (status) {
             val bleManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             mBleAdapter = bleManager.adapter
@@ -58,6 +60,7 @@ class BleClientActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+        binding.toolbar.setTitle(R.string.ble_client)
         mListAdapter.setOnItemClickListener { a, _, p ->
             a.getItem(p)?.device?.let { connect(it) }
         }
@@ -118,9 +121,14 @@ class BleClientActivity : AppCompatActivity() {
     }
 
     private fun write(gatt: BluetoothGatt) {
+        val text = binding.input.text.toString()
+        if (text.toByteArray().size > 20) {
+            toast("最多只能发送20个字节")
+            return
+        }
         val service = gatt.getService(UUID_SERVICE) ?: return
         val characteristic = service.getCharacteristic(UUID_CAHR_WRITE)
-        characteristic.setValue(binding.input.text.toString())
+        characteristic.setValue(text)
         checkConnectPermission { gatt.writeCharacteristic(characteristic) }
     }
 

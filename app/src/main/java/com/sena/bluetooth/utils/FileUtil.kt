@@ -16,7 +16,6 @@ import android.provider.OpenableColumns
 import androidx.annotation.RequiresApi
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.math.roundToInt
 
 
 /**
@@ -133,34 +132,34 @@ object FileUtil {
         }
         return path
     }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    @SuppressLint("Range", "Recycle")
-    fun getFileByUri(context: Context, uri: Uri): File? {
-        var file: File? = null
-        if (ContentResolver.SCHEME_FILE == uri.scheme) {
-            file = File(uri.path!!)
-        } else if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
-            val cr = context.contentResolver
-            cr.query(uri, null, null, null)?.let { cursor ->
-                cursor.moveToFirst()
-
-                cr.openInputStream(uri)?.let {
-                    val displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                    val cache = File(context.externalCacheDir, "${((Math.random() + 1) * 10000).roundToInt()}${displayName}")
-                    val fos = FileOutputStream(cache)
-                    FileUtils.copy(it, fos)
-                    file = cache
-
-                    it.close()
-                    fos.close()
-                }
-
-            }
-        }
-
-        return file
-    }
+//
+//    @RequiresApi(Build.VERSION_CODES.Q)
+//    @SuppressLint("Range", "Recycle")
+//    fun getFileByUri(context: Context, uri: Uri): File? {
+//        var file: File? = null
+//        if (ContentResolver.SCHEME_FILE == uri.scheme) {
+//            file = File(uri.path!!)
+//        } else if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
+//            val cr = context.contentResolver
+//            cr.query(uri, null, null, null)?.let { cursor ->
+//                cursor.moveToFirst()
+//
+//                cr.openInputStream(uri)?.let {
+//                    val displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+//                    val cache = File(context.externalCacheDir, "${((Math.random() + 1) * 10000).roundToInt()}${displayName}")
+//                    val fos = FileOutputStream(cache)
+//                    FileUtils.copy(it, fos)
+//                    file = cache
+//
+//                    it.close()
+//                    fos.close()
+//                }
+//
+//            }
+//        }
+//
+//        return file
+//    }
 
 
     

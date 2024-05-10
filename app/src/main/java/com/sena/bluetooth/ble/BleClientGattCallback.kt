@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.content.Context
-import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.utils.checkConnectPermission
 
 
 /**
@@ -18,7 +18,6 @@ class BleClientGattCallback(context: Context, func: (log: String) -> Unit) : Blu
 
     private val mContext = context
     private val mFunc = func
-
 
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         super.onServicesDiscovered(gatt, status)

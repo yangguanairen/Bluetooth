@@ -8,7 +8,7 @@ import com.chad.library.adapter4.BaseQuickAdapter
 import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.google.gson.Gson
 import com.sena.bluetooth.R
-import com.sena.bluetooth.getDeviceName
+import com.sena.bluetooth.utils.getDeviceName
 
 
 /**

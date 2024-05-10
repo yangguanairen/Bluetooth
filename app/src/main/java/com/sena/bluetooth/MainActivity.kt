@@ -17,6 +17,10 @@ import com.sena.bluetooth.ble.BleServerActivity
 import com.sena.bluetooth.bt.BtClientActivity
 import com.sena.bluetooth.bt.BtServerActivity
 import com.sena.bluetooth.databinding.ActivityMainBinding
+import com.sena.bluetooth.utils.toast
+
+
+const val INTENT_STATUS = "status"
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,24 +65,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+       binding.toolbar.setTitle(R.string.app_name)
        binding.bleClient.setOnClickListener {
            val intent = Intent(this, BleClientActivity::class.java)
-           intent.putExtra("status", haveAllCondition)
+           intent.putExtra(INTENT_STATUS, haveAllCondition)
            startActivity(intent)
        }
         binding.bleServer.setOnClickListener {
             val intent = Intent(this, BleServerActivity::class.java)
-            intent.putExtra("status", haveAllCondition)
+            intent.putExtra(INTENT_STATUS, haveAllCondition)
             startActivity(intent)
         }
         binding.btClient.setOnClickListener {
             val intent = Intent(this, BtClientActivity::class.java)
-            intent.putExtra("status", haveAllCondition)
+            intent.putExtra(INTENT_STATUS, haveAllCondition)
             startActivity(intent)
         }
         binding.bteServer.setOnClickListener {
             val intent = Intent(this, BtServerActivity::class.java)
-            intent.putExtra("status", haveAllCondition)
+            intent.putExtra(INTENT_STATUS, haveAllCondition)
             startActivity(intent)
         }
     }

@@ -5,94 +5,112 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ble.BleClientActivity"
-    android:padding="8dp">
+    android:background="@color/white"
+    tools:context=".ble.BleClientActivity">
 
-    <TextView
-        android:id="@+id/scan"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="重新扫描"
-        style="@style/button" />
+        android:layout_height="wrap_content">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bg_view" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/toolbar_bg"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp">
+        android:layout_height="match_parent"
+        android:padding="8dp">
 
         <TextView
-            android:id="@+id/read"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="@style/button"
-            android:layout_marginEnd="4dp"
-            android:text="读取" />
-
-        <TextView
-            android:id="@+id/setNotify"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="@style/button"
-            android:layout_marginStart="4dp"
-            android:text="设置通知" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp">
-
-        <EditText
-            android:id="@+id/input"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:lines="1"
-            android:hint="最多20个字节"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:layout_marginEnd="4dp" />
-
-        <TextView
-            android:id="@+id/write"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="@style/button"
-            android:layout_marginStart="4dp"
-            android:text="写入" />
-
-    </LinearLayout>
-
-    <ScrollView
-        android:id="@+id/logLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bg_view" >
-
-        <TextView
-            android:id="@+id/log"
+            android:id="@+id/scan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:textIsSelectable="true" />
+            android:text="@string/scan"
+            style="@style/button" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_view" />
 
-    </ScrollView>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/read"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button"
+                android:layout_marginEnd="4dp"
+                android:text="@string/read" />
+
+            <TextView
+                android:id="@+id/setNotify"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button"
+                android:layout_marginStart="4dp"
+                android:text="@string/setNotify" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <EditText
+                android:id="@+id/input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/max_byte"
+                style="@style/input"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/write"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button"
+                android:layout_marginStart="4dp"
+                android:text="@string/write" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/logLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_view" >
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                style="@style/log" />
+
+        </ScrollView>
+
+    </LinearLayout>
 
 </LinearLayout>

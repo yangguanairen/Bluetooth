@@ -9,7 +9,7 @@ import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
-import com.sena.bluetooth.checkConnectPermission
+import com.sena.bluetooth.utils.checkConnectPermission
 import kotlin.random.Random
 
 

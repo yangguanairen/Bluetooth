@@ -7,8 +7,8 @@ import android.widget.TextView
 import com.chad.library.adapter4.BaseQuickAdapter
 import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.sena.bluetooth.R
-import com.sena.bluetooth.getDeviceBond
-import com.sena.bluetooth.getDeviceName
+import com.sena.bluetooth.utils.getDeviceBond
+import com.sena.bluetooth.utils.getDeviceName
 
 
 /**

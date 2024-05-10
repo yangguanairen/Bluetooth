@@ -9,4 +9,17 @@
         <item name="android:background">@drawable/bg_button</item>
     </style>
 
+    <style name="input">
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="singleLine">true</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="android:textColor">@color/toolbar_bg</item>
+    </style>
+
+    <style name="log">
+        <item name="android:textIsSelectable">true</item>
+        <item name="android:textColor">@color/toolbar_bg</item>
+    </style>
+
 </resources>

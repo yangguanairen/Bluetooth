@@ -5,39 +5,60 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:padding="16dp">
+    android:background="@color/white"
+    tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/bleClient"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BLE客户端"
-        style="@style/button" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/bleServer"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/toolbar_bg"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BLE服务端"
-        android:layout_marginTop="16dp"
-        style="@style/button" />
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
+        <TextView
+            android:id="@+id/btClient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_client"
+            style="@style/button" />
 
-    <TextView
-        android:id="@+id/btClient"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:text="BT客户端"
-        style="@style/button" />
+        <TextView
+            android:id="@+id/bteServer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_server"
+            android:layout_marginTop="16dp"
+            style="@style/button" />
 
-    <TextView
-        android:id="@+id/bteServer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BT服务端"
-        android:layout_marginTop="16dp"
-        style="@style/button" />
+        <TextView
+            android:id="@+id/bleClient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ble_client"
+            android:layout_marginTop="64dp"
+            style="@style/button" />
+
+        <TextView
+            android:id="@+id/bleServer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ble_server"
+            android:layout_marginTop="16dp"
+            style="@style/button" />
+
+    </LinearLayout>
+
 
 </LinearLayout>
